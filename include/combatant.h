@@ -35,6 +35,9 @@ typedef struct {
 typedef struct {
     char name[50];         /* Nom du combattant */
     
+    int x;                 /**< Position horizontale (Colonne) */
+    int y;                 /**< Position verticale (Ligne) */
+    
     /* Stats de Vie */
     int pv;                /* Points de vie actuels */
     int max_pv;            /* Points de vie maximums */
