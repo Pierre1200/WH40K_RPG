@@ -16,42 +16,54 @@ void execute_attack(Combatant *attacker, Combatant *defender, Weapon *weapon)
 {
     printf("\n> %s attaque avec %s !\n", attacker->name, weapon->name);
     
-    /* On boucle pour chaque attaque que l'arme permet de faire */
     for (int i = 0; i < weapon->nb_attacks; i++)
     {
-        /* Calcul des chances de toucher (Base de l'arme + Dexterite de l'attaquant) */
         int total_hit_chance = weapon->base_hit_chance + attacker->dex;
         int bonus_dmg = 0;
 
-        /* Si les chances depassent 100%, le surplus se transforme en degats bonus */
         if (total_hit_chance > 100)
         {
             bonus_dmg = (total_hit_chance - 100) / 10;
             total_hit_chance = 100;
         }
 
-        /* Lancer du de (un nombre aleatoire entre 1 et 100) */
+        /* --- SYSTEME : ROLL HIGH --- */
+        int seuil_a_depasser = 100 - total_hit_chance + 1;
+        
+        if (seuil_a_depasser < 1) seuil_a_depasser = 1;
+
         int roll = (rand() % 100) + 1; 
 
-        /* Si le de est inferieur ou egal aux chances de toucher, l'attaque reussit */
-        if (roll <= total_hit_chance)
+        /* --- NOUVEAU : VERIFICATION DU COUP CRITIQUE (100 naturel) --- */
+        int raw_dmg;
+        int final_dmg;
+        char *hit_type_msg = ""; /* Message pour l'affichage (vide par defaut) */
+
+        if (roll >= seuil_a_depasser)
         {
-            /* Calcul des degats de base (Force arme - Endurance defenseur) */
-            int raw_dmg = weapon->strength - defender->end;
-            if (raw_dmg < 1) raw_dmg = 1; /* Minimum 1 degat avant armure */
+            /* Touche normale */
+            raw_dmg = weapon->strength - defender->end;
+            if (raw_dmg < 1) raw_dmg = 1;
 
-            /* L'armure encaisse une partie des degats */
-            int final_dmg = raw_dmg - defender->equipped_armor.armor_value + bonus_dmg;
-            if (final_dmg < 0) final_dmg = 0; /* Si l'armure est trop forte, 0 degat */
+            final_dmg = raw_dmg - defender->equipped_armor.armor_value + bonus_dmg;
+            if (final_dmg < 0) final_dmg = 0;
 
-            /* On retire les degats aux PV du defenseur */
+            /* Si c'est un 100 pile, on applique le critique (x 1.5 degats FINAUX) */
+            if (roll == 100)
+            {
+                /* En C, pour multiplier un int par 1.5, il faut utiliser des floats temporaires */
+                final_dmg = (int)((float)final_dmg * 1.5f);
+                hit_type_msg = "!! COUP CRITIQUE !! "; /* On prepare le message epic */
+            }
+
             defender->pv -= final_dmg;
-            printf("  [Coup %d] TOUCHE. (De: %d) | Degats : %d (Armure ennemie a absorbe: %d)\n", 
-                   i+1, roll, final_dmg, defender->equipped_armor.armor_value);
+            /* Affichage mis a jour avec le type de coup */
+            printf("  [Coup %d] %sTOUCHE. (De: %d) | Degats : %d (Armure: %d)\n", 
+                   i+1, hit_type_msg, roll, final_dmg, defender->equipped_armor.armor_value);
         }
         else
         {
-            printf("  [Coup %d] RATE. (De: %d / Fallait faire moins de: %d)\n", i+1, roll, total_hit_chance);
+            printf("  [Coup %d] RATE. (De: %d / Fallait faire %d ou plus)\n", i+1, roll, seuil_a_depasser);
         }
     }
 }
@@ -68,7 +80,7 @@ void execute_psy(Combatant *caster, Combatant *target)
         return;
     }
 
-    /* On lance un de a 20 faces (D20) et on ajoute la stat Psy du lanceur */
+    /* On lance un des a 20 faces (D20) et on ajoute la stat Psy du lanceur */
     int roll = (rand() % 20) + 1 + caster->psy;
     
     /* On verifie si le jet depasse la difficulte (warp_charge) du sort */

@@ -24,7 +24,7 @@ int main(void)
     Combatant plague_marine = {
         "Frere Vorx", 
         1, 1, /* x, y */
-        100, 100, 8, 45, 5,
+        100, 100, 8, 20, 5,
         {"Bolter de la Peste", 2, 14, 50, 0},
         {"Couteau de la Peste", 3, 16, 60, 1},
         {"Armure Energetique", 3},
@@ -35,15 +35,15 @@ int main(void)
     Combatant guardsman = {
         "Conscrit Cadian", 
         10, 3, /* x, y */
-        30, 30, 3, 20, 0, 
-        {"Fusil Laser", 1, 6, 40, 0},
-        {"Baionnette Fixee", 1, 4, 30, 1},
+        30, 30, 3, 30, 0, 
+        {"Fusil Laser", 4, 6, 40, 0},
+        {"Baionnette Fixee", 2, 4, 30, 1},
         {"Gilet Pare-Eclats", 1},
         {"Priere", 99, 0, 1} 
     };
 
     /* --- 2. CREATION DE LA CARTE --- */
-    /* Un tableau de chaines de caracteres. '#' = Mur, '.' = Sol toxique */
+    /* Un tableau de chaines de caracteres. '#' = Mur, '.' = Sol */
     char map[MAP_HEIGHT][MAP_WIDTH + 1] = {
         "###############",
         "#.............#",
