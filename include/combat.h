@@ -1,18 +1,14 @@
-/**
- * @file combat.h
- * @brief Ce fichier sert de "menu". Il annonce aux autres fichiers 
- * les fonctions de combat qui existent et qu'ils ont le droit d'utiliser.
- */
-
 #ifndef COMBAT_H
 #define COMBAT_H
 
 #include "combatant.h"
 
-/* * On annonce la fonction start_combat. 
- * Les etoiles (*) signifient qu'on attend l'adresse en memoire (pointeur) 
- * des personnages, pas une simple copie.
+/* * NOUVEAU : Nos fonctions de combat demandent maintenant un "char *log_buffer".
+ * C'est le tableau de texte que l'interface graphique va lire pour l'afficher à l'écran.
  */
-void start_combat(Combatant *player, Combatant *enemy);
+void execute_attack(Combatant *attacker, Combatant *defender, Weapon *weapon, char *log_buffer);
+void execute_psy(Combatant *caster, Combatant *target, char *log_buffer);
 
-#endif 
+/* Note: On a supprime start_combat d'ici, car la boucle de combat sera gérée par la SDL dans le main.c */
+
+#endif
